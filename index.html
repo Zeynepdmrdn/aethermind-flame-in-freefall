@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flame in Freefall | Team AetherMind</title>
+<meta name="description" content="Team AetherMind's NASA Space Apps Challenge entry, Flame in Freefall: a dashboard of AI-assisted source summaries of NASA microgravity combustion studies with a source-cited evidence search and an optional AI-written cited answer. Code and summaries drafted with Claude (Anthropic).">
+<meta name="author" content="Team AetherMind; code and summaries drafted with Claude (Anthropic)">
+<meta name="generator" content="Drafted with Claude (Anthropic), Claude Sonnet 5.5">
+<meta name="theme-color" content="#0b1530">
+<style>
+:root{
+  --bg:#0b1530; --panel:#12214a; --panel2:#182a5c; --line:#2b3f78;
+  --text:#eef2fb; --muted:#b4c0de; --accent:#ffa94d; --accent-ink:#1a1000;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:18px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 12px;border-bottom:1px solid var(--line)}
+.team{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem;margin:0}
+h1{font-size:clamp(1.9rem,5vw,2.8rem);line-height:1.15;margin:.2em 0}
+.lede{color:var(--muted);margin:0;max-width:60ch}
+h2{font-size:1.3rem;margin:0 0 .4em}
+h3{margin:0;font-size:1.15rem}
+section{padding:22px 0}
+.topics{display:flex;flex-wrap:wrap;gap:10px;border:0;margin:0;padding:0}
+.topics legend{font-weight:700;margin-bottom:8px;padding:0}
+.topics button{font:inherit;font-weight:600;color:var(--text);background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:10px 18px;cursor:pointer;min-height:44px}
+.topics button:hover{border-color:var(--accent)}
+.topics button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.rule{background:var(--panel);border-left:4px solid var(--accent);padding:12px 16px;border-radius:6px;margin-top:16px;color:var(--muted);font-size:.95rem}
+.rule strong{color:var(--text)}
+.order-label{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline;margin:20px 0 10px}
+.badge{display:inline-block;font-size:.8rem;font-weight:700;border-radius:6px;padding:2px 9px;border:1px solid var(--accent);color:var(--accent);white-space:nowrap}
+.badge.solid{background:var(--accent);color:var(--accent-ink)}
+.cards{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.card>button.head{all:unset;box-sizing:border-box;display:block;width:100%;padding:16px 18px;cursor:pointer;border-radius:12px}
+.card>button.head:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.card .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.card .sub{color:var(--muted);font-size:.95rem;margin:6px 0 0}
+.card .chev{float:right;color:var(--accent);font-weight:700}
+.detail{padding:0 18px 18px;border-top:1px solid var(--line)}
+.detail[hidden]{display:none}
+.field{margin-top:14px}
+.field h4{margin:0 0 2px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.field p{margin:0}
+.interp{background:var(--panel2);border-radius:8px;padding:10px 12px}
+.na{color:var(--muted);font-style:italic}
+.cmp-pick{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0}
+label.sel{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:.95rem}
+select{font:inherit;color:var(--text);background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:9px 12px;min-height:44px;min-width:220px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:640px;background:var(--panel)}
+th,td{text-align:left;vertical-align:top;padding:10px 14px;border-bottom:1px solid var(--line)}
+thead th{background:var(--panel2)}
+tbody th{width:20%;color:var(--accent);font-size:.9rem}
+tr:last-child th,tr:last-child td{border-bottom:0}
+.note{color:var(--muted);font-size:.92rem}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:.95rem}
+footer p{margin:.5em 0}
+.sr{position:absolute;left:-9999px}
+/* timeline */
+.tl{margin-top:16px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.tl h4.tl-h{margin:0 0 4px;font-size:1rem;color:var(--text);text-transform:none;letter-spacing:0}
+.tl .warn{border-left:4px solid var(--accent);padding:6px 10px;margin:8px 0 14px;font-size:.95rem;background:var(--panel)}
+.track{position:relative;height:100px;margin:6px 6px 0}
+.axis{position:absolute;left:0;right:0;top:46px;height:4px;background:var(--line);border-radius:2px}
+.span{position:absolute;top:36px;height:24px;background:rgba(255,169,77,.22);border:2px solid var(--accent);border-radius:6px}
+.span-l{position:absolute;top:68px;transform:translateX(-50%);font-weight:700;font-size:.9rem;white-space:nowrap;color:var(--accent)}
+.mk{position:absolute;top:30px;width:4px;height:36px;margin-left:-2px;background:var(--text);border-radius:2px}
+.mk.on{background:var(--accent);box-shadow:0 0 0 3px rgba(255,169,77,.4)}
+.mk-l{position:absolute;top:4px;transform:translateX(-50%);font-weight:700;font-size:.85rem;white-space:nowrap}
+.cursor{position:absolute;top:22px;width:2px;height:52px;margin-left:-1px;background:var(--accent);opacity:.9;pointer-events:none}
+.ticks{position:relative;height:22px;margin:0 6px;color:var(--muted);font-size:.8rem}
+.ticks span{position:absolute;transform:translateX(-50%);top:0;white-space:nowrap}
+.ticks span:first-child{transform:none}
+.tl-btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.tl-btns button{font:inherit;font-size:.92rem;font-weight:600;color:var(--text);background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:8px 12px;min-height:44px;cursor:pointer}
+.tl-btns button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tl input[type=range]{width:100%;accent-color:#ffa94d;min-height:32px}
+.tl-out{background:var(--panel);border-radius:8px;padding:10px 12px;margin-top:8px}
+.tl-out p{margin:.3em 0}
+.tl dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:10px 0 0;font-size:.95rem}
+.tl dt{color:var(--accent);font-weight:700}
+.tl dd{margin:0}
+/* retrieval */
+.ask label{display:block;font-weight:700;margin:12px 0 6px}
+.ask-row{display:flex;flex-wrap:wrap;gap:10px}
+.ask input{flex:1 1 280px;font:inherit;color:var(--text);background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:10px 14px;min-height:48px}
+.go{font:inherit;font-weight:700;background:var(--accent);color:var(--accent-ink);border:2px solid var(--accent);border-radius:8px;padding:10px 20px;min-height:48px;cursor:pointer}
+.exl{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.exl button{font:inherit;font-size:.9rem;text-align:left;color:var(--text);background:transparent;border:1px dashed var(--line);border-radius:8px;padding:8px 12px;min-height:44px;cursor:pointer}
+.exl button:hover{border-color:var(--accent)}
+.res{margin-top:16px}
+.res .warn{border-left:4px solid var(--accent);padding:8px 12px;background:var(--panel);margin:0 0 12px}
+.insuff{background:var(--panel);border:2px solid var(--accent);border-radius:10px;padding:4px 18px 12px}
+.hits{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:12px}
+.hit{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.hit p{margin:.4em 0}
+.hit-h{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.hit-text{font-size:1.02rem}
+mark{background:rgba(255,169,77,.3);color:var(--text);border-radius:3px;padding:0 2px}
+.why{font-size:.92rem;color:var(--muted)}
+.why strong{color:var(--text)}
+.open-card{font:inherit;font-weight:600;color:var(--text);background:var(--panel2);border:2px solid var(--line);border-radius:8px;padding:8px 14px;min-height:44px;cursor:pointer;margin-top:4px}
+.open-card:hover{border-color:var(--accent)}
+.method{margin-top:16px;color:var(--muted);font-size:.95rem}
+.method summary{cursor:pointer;color:var(--text);font-weight:600}
+.method ol{padding-left:22px}
+header .ask label{display:block;font-weight:700;font-size:1.05rem;margin:18px 0 6px}
+header .ask input{min-height:54px;font-size:1.05rem}
+header .go{min-height:54px;padding:10px 30px;font-size:1.05rem}
+header .ex{margin-top:8px}
+.mode{margin:10px 0 0;padding:8px 12px;border-left:4px solid var(--accent);background:var(--panel);border-radius:6px;font-size:.95rem;color:var(--text)}
+.mode:empty{display:none}
+#evidence{padding-top:24px}
+#evidence h2:focus{outline:none}
+#evidence h2:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.res-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 20px;align-items:flex-start;margin:6px 0 10px}
+.res-head>.note{flex:1 1 320px;margin:6px 0 0}
+.gen{flex:0 1 330px}
+.gen .go{width:100%}
+.gen .note{margin:6px 0 0}
+.gen .note:empty{display:none}
+.badge.related{border-style:dashed;color:var(--text);border-color:var(--text)}
+.hit.is-related{border-style:dashed}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.actions .open-card{margin-top:0}
+.tl:focus{outline:none}
+.tl:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+@media (max-width:600px){.gen{flex:1 1 100%}header .ask .go{width:100%}}
+.synth{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 18px 16px}
+.synth-out{margin-top:12px}
+.synth-msg{border-radius:10px;padding:2px 14px 12px;border:2px solid var(--line);background:var(--panel2)}
+.synth-msg.error{border-color:var(--accent)}
+.synth-msg.insufficient{border-color:var(--accent)}
+.loading{color:var(--muted)}
+.mockbar{background:var(--accent);color:var(--accent-ink);font-weight:700;padding:6px 12px;border-radius:6px}
+.syn-ans{background:var(--panel2);border-radius:10px;padding:10px 16px 12px}
+.claims{margin:8px 0;padding-left:20px}
+.claim{margin:.6em 0}
+.cite{font-weight:700;white-space:nowrap}
+.kinds{display:inline-flex;flex-wrap:wrap;gap:6px;margin-left:4px;vertical-align:middle}
+button:disabled{opacity:.55;cursor:not-allowed}
+.sum{margin-top:16px;background:var(--panel);border-left:4px solid var(--accent);border-radius:6px;padding:12px 16px}
+.sum p{margin:.4em 0}
+@media (max-width:600px){body{font-size:17px}select{min-width:100%}label.sel{width:100%}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <p class="team">Team AetherMind &middot; NASA Space Apps Challenge</p>
+    <h1>Flame in Freefall</h1>
+    <p class="lede">Ask a question in English and get the matching passages from three NASA microgravity combustion studies, each with its scope and a link to the NASA source.</p>
+    <form id="ask" class="ask" role="search">
+      <label for="q">Your question</label>
+      <div class="ask-row">
+        <input id="q" name="q" type="text" autocomplete="off" placeholder="e.g. What airflow was used in the VI-3 test?">
+        <button type="submit" class="go">Search</button>
+      </div>
+    </form>
+    <div class="ex"><span class="note">Examples (fill the box only):</span><div id="ex" class="exl"></div></div>
+    <p class="mode" id="mode-note" role="status"></p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="evidence" aria-labelledby="ev-h" hidden>
+    <h2 id="ev-h" tabindex="-1">Evidence</h2>
+    <div id="res" class="res"></div>
+    <details class="method"><summary>How the retrieval works</summary>
+      <ol>
+        <li>Each passage is a short quotation from a NASA source, tagged with study, evidence type (reported finding, test condition or study objective), source URL and PDF slide number where one applies. Passages also carry verified metadata: platform, vehicle, sample material or fuel, and the variables measured or varied.</li>
+        <li>Your question and the passages are lower-cased, split into words, stripped of common words and lightly stemmed (for example detected, detection and detector all reduce to detect).</li>
+        <li>A small hand-written synonym map links domain terms (for example airflow, ventilation and flow). A synonym match counts 0.6 of an exact match.</li>
+        <li>Passages are scored with BM25F (BM25 with weighted fields: text 2, metadata 1.5, label 0.5; k1 1.5, b 0.75). Rare words count for more than common ones.</li>
+        <li>If you name a study (Saffire, FLEX, SoFIE or MIST), only that study's passages are searched; the name itself is not counted as a match.</li>
+        <li>A passage is shown only if it covers at least 40% of your question's weighted terms, at least 75% of the best passage's coverage, and at least 60% of the best score. If none qualifies, the result is "Insufficient evidence".</li>
+        <li>If you ask for a value (a concentration, a pressure, how long, when) and no returned passage gives a number with a unit, the passages are labelled "Related, not an answer".</li>
+      </ol>
+      <p class="note">Search is keyword matching, not AI. It can miss a passage that uses different words and can return loosely related passages for short questions. Read the source and its scope before relying on a passage.</p>
+    </details>
+  </section>
+
+  <section aria-labelledby="topic-h">
+    <fieldset class="topics">
+      <legend id="topic-h">Or browse the studies by topic</legend>
+      <button type="button" data-topic="smoke" aria-pressed="true">Smoke Detection</button>
+      <button type="button" data-topic="extinction" aria-pressed="false">Extinction</button>
+      <button type="button" data-topic="flammability" aria-pressed="false">Material Flammability</button>
+    </fieldset>
+
+    <div class="rule" id="rule">
+      <strong>How the ordering works:</strong> fixed topic rules, not AI. Each study gets points for the selected topic:
+      <strong>2</strong> = its reported finding or stated objective directly addresses the topic;
+      <strong>1</strong> = mentioned only as context;
+      <strong>0</strong> = not mentioned. Higher points come first; ties keep the original order (Saffire VI, FLEX, SoFIE-MIST).
+      The points are a sorting aid only, not a measure of importance, safety or risk.
+    </div>
+
+    <div class="order-label">
+      <h2 id="order-h">Studies, ordered by: <span class="badge solid">Topic relevance</span></h2>
+      <span class="badge">AI-assisted source summaries</span>
+    </div>
+    <p class="note" id="order-note" aria-live="polite"></p>
+    <ol class="cards" id="cards" aria-labelledby="order-h"></ol>
+  </section>
+
+  <section aria-labelledby="cmp-h">
+    <h2 id="cmp-h">Compare two studies</h2>
+    <p class="note">Differences in what each source studied and which conditions it reported. "Not reported in this source" means the cited page does not give that detail.</p>
+    <div class="cmp-pick">
+      <label class="sel">Study A
+        <select id="cmpA"></select>
+      </label>
+      <label class="sel">Study B
+        <select id="cmpB"></select>
+      </label>
+    </div>
+    <p class="note" id="cmp-msg" aria-live="polite"></p>
+    <div class="tablewrap"><table id="cmp-table"></table></div>
+    <div class="sum" id="cmp-sum" aria-live="polite"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Credits:</strong> Team AetherMind. Claude (Anthropic) helped draft this page's code and the AI-assisted source summaries. Summaries were checked against the linked NASA pages when drafted, but the NASA sources are the authority; please read them directly.</p>
+    <p>This is an unofficial student project for the NASA Space Apps Challenge. It is not endorsed by NASA. Topic ordering and local evidence search use fixed rules, not AI. The optional "Generate cited answer" button, available only when the host has enabled it, sends your question and passage IDs to this site's server, which asks an AI model for a short answer with citations (a free local Ollama model on the host's own computer, or Claude through the Anthropic API, depending on how the host configured it); it is labelled as AI-generated and may contain errors. The page gives no safety recommendations and calculates no risk scores.</p>
+  </div>
+</footer>
+
+<script src="corpus.js"></script>
+<script src="search.js"></script>
+<script>
+(function(){
+"use strict";
+var NA = "Not reported in this source";
+
+var STUDIES = [
+  {
+    id:"saffire", name:"Saffire VI", kind:"Conference presentation (NASA Technical Reports Server)",
+    url:"https://ntrs.nasa.gov/citations/20240007488",
+    sourceTitle:"Preliminary Results from the Saffire VI Experiment (Urban et al., ICES 2024)",
+    status:"Preliminary result from one test",
+    evType:"Reported observation", evScope:"one test (VI-3), preliminary",
+    points:{smoke:2, extinction:1, flammability:1},
+    why:{
+      smoke:"Direct: the source reports when smoke was detected relative to gas release.",
+      extinction:"Context: the abstract names flame self-extinguishment among the gaps in spacecraft fire understanding.",
+      flammability:"Context: tests burned fabric and PMMA samples and measured heat release."
+    },
+    studied:"Fire behavior at practical spacecraft scale, using a large burning sample in an orbiting spacecraft; this source focuses on the two-sided PMMA sample.",
+    findingLabel:"Reported finding (preliminary, one test)",
+    finding:"In the two-sided PMMA test (Saffire VI-3), the presentation states that smoke was readily detected at 981 seconds, after most of the hazardous gas release had occurred. Ignition was at 637 s.",
+    context:"Flown on an orbiting Cygnus spacecraft. Two-sided PMMA sample, 1 cm thick and 18 cm long, with concurrent air flow at 20 cm/s (reduced to 5 cm/s at 1120 s, flow terminated at 1420 s). Ambient pressure 54.6 kPa, oxygen 30.3 mol%, free volume 16.7 m³. Smoke was measured by a far-field ionization smoke detector.",
+    interp:"This is one test with one material, so it shows what happened in that run only. It should not be read as a general rule about smoke detection timing.",
+    cond:{platform:"Cygnus spacecraft in orbit (Saffire VI)", material:"Two-sided PMMA, 1 cm thick, 18 cm long", flow:"20 cm/s concurrent (later reduced to 5 cm/s)", oxygen:"30.3 mol%", pressure:"54.6 kPa", fuel:"Solid (PMMA)"}
+  },
+  {
+    id:"flex", name:"FLEX (cool flames)", kind:"NASA article, July 16, 2021",
+    url:"https://www.nasa.gov/missions/station/cool-flames-created-during-a-first-for-international-space-station-research/",
+    sourceTitle:"Cool Flames Created During a First for International Space Station Research",
+    status:"Reported by NASA",
+    evType:"Reported observation", evScope:"NASA article; no test conditions given",
+    points:{smoke:0, extinction:2, flammability:0},
+    why:{
+      smoke:"Not mentioned in this source.",
+      extinction:"Direct: the study is named Flame Extinguishment (FLEX) and the article reports a discovery from it.",
+      flammability:"Not mentioned in this source."
+    },
+    studied:"Cool flames: faint flames that burn at very low temperatures, where fuel and oxidizer are not premixed (non-premixed).",
+    findingLabel:"Reported finding",
+    finding:"NASA reports that non-premixed cool flames were discovered in 2012 aboard the International Space Station during the Flame Extinguishment (FLEX) studies.",
+    context:"Aboard the International Space Station, where NASA says cool flames are easily produced in microgravity. The 2012 flames burned liquid fuel; the article does not name the fuel. The article’s main subject is later work: the June 2021 CFI-G tests burned gaseous fuels, and in those tests faint cool flames were found in thermal radiation and burner temperature data after the hot flames were quenched. That later detail is not a FLEX result.",
+    interp:"The article is about a discovery and what it may mean for engines, not about fire safety or detection. It is placed under Extinction because the study name refers to extinguishment, not because it reports extinction results.",
+    cond:{platform:"International Space Station", material:NA, flow:NA, oxygen:NA, pressure:NA, fuel:"Liquid fuel in 2012 (fuel not named); gaseous fuels in later 2021 work"}
+  },
+  {
+    id:"sofie", name:"SoFIE-MIST", kind:"NASA investigation page",
+    url:"https://science.nasa.gov/biological-physical/investigations/sofie-mist/",
+    sourceTitle:"Solid Fuel Ignition and Extinction – Material Ignition and Suppression Test (SoFIE-MIST)",
+    status:"Study objective (no results on this page)",
+    evType:"Study objective", evScope:"stated goals; no results on the page",
+    points:{smoke:0, extinction:2, flammability:2},
+    why:{
+      smoke:"Not mentioned in this source.",
+      extinction:"Direct: the stated objective includes determining ignition and extinction boundaries.",
+      flammability:"Direct: the stated objective includes validating material flammability models."
+    },
+    studied:"Thermally assisted burning of a solid fuel in microgravity, and how ignition and extinction boundaries depend on flow speed, oxygen concentration and external radiant flux.",
+    findingLabel:"Study objective (not a result)",
+    finding:"NASA describes the investigation as examining thermally assisted burning in microgravity while varying air flow speed, oxygen concentration, pressure and level of external radiation. It aims to improve understanding of early fire growth and to validate material flammability models.",
+    context:"The solid fuel is a PMMA cylinder. The page also mentions lower-pressure, oxygen-enriched space exploration atmospheres. Its status line states delivery to the International Space Station via SpaceX-27. No measured results are given on the page.",
+    interp:"This page states what will be studied, so it cannot tell us what was found. Its relevance to flammability comes from the stated model-validation goal.",
+    cond:{platform:"International Space Station (delivery via SpaceX-27, per the page's status line)", material:"PMMA cylinder", flow:"Varied (values "+NA.toLowerCase()+")", oxygen:"Varied (values "+NA.toLowerCase()+")", pressure:"Varied (values "+NA.toLowerCase()+")", fuel:"Solid (PMMA)"}
+  }
+];
+
+/* Saffire VI-3 evidence. Each value was checked against the NASA presentation PDF
+   (text of the PDF page; page number = printed slide number). */
+var PDF = "https://ntrs.nasa.gov/api/citations/20240007488/downloads/Saffire%20ICES%202024%20Saffire%20presentation072124small.pdf";
+function slide(n){ return PDF+"#page="+n; }
+var IGNITION_S = 637;   // "Ignition at 637 s": slides 16, 17, 18
+var SMOKE_S = 981;      // "The smoke was readily detected at 981 seconds": slide 21 (Conclusions)
+var INTERVAL_S = SMOKE_S - IGNITION_S; // calculated here (344 s); not stated by NASA
+var AXIS_MAX = 1100;
+var TL_CONDITIONS = [
+  ["Sample","Two-sided PMMA, 1 cm thick, 18 cm long",[["slide 11",11],["slide 12",12]]],
+  ["Airflow","20 cm/s, concurrent; reduced to 5 cm/s at 1120 s; terminated at 1420 s",[["slide 11",11],["slide 16",16]]],
+  ["Ambient pressure","54.6 kPa",[["slide 11",11]]],
+  ["Oxygen","30.3 mol%",[["slide 11",11]]],
+  ["Free volume","16.7 m³",[["slide 11",11]]]
+];
+
+var TOPICS = {smoke:"Smoke Detection", extinction:"Extinction", flammability:"Material Flammability"};
+var current = "smoke";
+var openId = null;
+
+function el(tag, attrs, kids){
+  var e = document.createElement(tag);
+  if(attrs) for(var k in attrs){
+    if(k==="text") e.textContent = attrs[k];
+    else e.setAttribute(k, attrs[k]);
+  }
+  (kids||[]).forEach(function(c){ e.appendChild(c); });
+  return e;
+}
+function field(label, text, cls){
+  var p = el("p", {text:text});
+  if(text===NA) p.className = "na";
+  var f = el("div", {"class":"field"+(cls?" "+cls:"")}, [el("h4",{text:label}), p]);
+  return f;
+}
+function ordered(topic){
+  return STUDIES.map(function(s,i){return {s:s,i:i};})
+    .sort(function(a,b){ return (b.s.points[topic]-a.s.points[topic]) || (a.i-b.i); })
+    .map(function(x){return x.s;});
+}
+function pointsLabel(n){ return n===2?"Direct (2)":n===1?"Context (1)":"Not mentioned (0)"; }
+
+function srcLinks(arr){
+  var p = el("span");
+  arr.forEach(function(x,i){
+    if(i) p.appendChild(document.createTextNode(", "));
+    p.appendChild(el("a",{href:slide(x[1]),target:"_blank",rel:"noopener",text:x[0]}));
+  });
+  return p;
+}
+function pct(t){ return (t/AXIS_MAX*100)+"%"; }
+
+function buildTimeline(){
+  var box = el("div",{"class":"tl",id:"timeline",tabindex:"-1"});
+  box.appendChild(el("h4",{"class":"tl-h",text:"Interactive timeline: reported Saffire VI-3 test"}));
+  box.appendChild(el("p",{"class":"warn",text:"Preliminary result from one test (two-sided PMMA, Saffire VI-3). The interval below describes this single run only and is not a general detection time for other fires, materials or spacecraft."}));
+
+  var track = el("div",{"class":"track",role:"img","aria-label":"Time axis in seconds. Ignition at "+IGNITION_S+" s, smoke detected at "+SMOKE_S+" s, calculated interval "+INTERVAL_S+" s."});
+  track.appendChild(el("div",{"class":"axis"}));
+  var span = el("div",{"class":"span",id:"tl-span"});
+  span.style.left = pct(IGNITION_S); span.style.width = ((SMOKE_S-IGNITION_S)/AXIS_MAX*100)+"%";
+  track.appendChild(span);
+  var spanL = el("div",{"class":"span-l",id:"tl-span-l",text:INTERVAL_S+" s (calculated)"});
+  spanL.style.left = pct((IGNITION_S+SMOKE_S)/2);
+  track.appendChild(spanL);
+  [["ign",IGNITION_S,"Ignition 637 s"],["smk",SMOKE_S,"Smoke 981 s"]].forEach(function(m){
+    var k = el("div",{"class":"mk",id:"mk-"+m[0]}); k.style.left = pct(m[1]);
+    var l = el("div",{"class":"mk-l",text:m[2]}); l.style.left = pct(m[1]);
+    l.style.transform = m[0]==="smk" ? "translateX(-80%)" : "translateX(-100%)"; /* keeps the two labels apart on narrow screens */
+    track.appendChild(k); track.appendChild(l);
+  });
+  var cur = el("div",{"class":"cursor",id:"tl-cursor"}); cur.style.left="0%"; track.appendChild(cur);
+  box.appendChild(track);
+
+  var ticks = el("div",{"class":"ticks","aria-hidden":"true"});
+  for(var t=0;t<=1000;t+=200){ var s=el("span",{text:t+" s"}); s.style.left=pct(t); ticks.appendChild(s); }
+  box.appendChild(ticks);
+
+  var out = el("div",{"class":"tl-out",id:"tl-out","aria-live":"polite"});
+  var btns = el("div",{"class":"tl-btns",role:"group","aria-label":"Timeline events"});
+  var EV = {
+    ign:{label:"Ignition: 637 s",text:"Reported: ignition at 637 s in the VI-3 test.",links:[["slide 16",16],["slide 17",17],["slide 18",18]],note:"The text “Ignition at 637 s” is annotated on the plots for this test on these slides."},
+    smk:{label:"Smoke detected: 981 s",text:"Reported: “The smoke was readily detected at 981 seconds (after most of the hazardous gas release had occurred).”",links:[["slide 21 (Conclusions)",21],["slide 19 (smoke detector figure for VI-3)",19]],note:"The 981 s value is given in the text of slide 21. Slide 19 shows the far-field smoke detector and particulate figure for this test; I did not read values off that figure. The slides do not say in words that both times share one clock, but both are seconds for the same VI-3 run."},
+    gap:{label:"Interval: 344 s (calculated)",text:"Calculated by this dashboard: "+SMOKE_S+" s − "+IGNITION_S+" s = "+INTERVAL_S+" s between the two reported times.",links:[["slide 16 (ignition)",16],["slide 21 (smoke)",21]],note:"NASA's slides do not state this interval. It is simple subtraction of the two reported times, for this one test only."}
+  };
+  var keys = ["ign","smk","gap"];
+  function show(key){
+    keys.forEach(function(k){ btns.querySelector('[data-ev="'+k+'"]').setAttribute("aria-pressed",String(k===key)); });
+    (box.querySelector("#mk-ign").className = "mk"+(key==="ign"||key==="gap"?" on":""));
+    box.querySelector("#mk-smk").className = "mk"+(key==="smk"||key==="gap"?" on":"");
+    var e = EV[key]; out.textContent = "";
+    out.appendChild(el("p",{text:e.text}));
+    out.appendChild(el("p",{"class":"note",text:e.note}));
+    out.appendChild(el("p",null,[document.createTextNode("Source in NASA presentation PDF: "), srcLinks(e.links)]));
+  }
+  keys.forEach(function(k){
+    var b = el("button",{type:"button","data-ev":k,"aria-pressed":"false",text:EV[k].label});
+    b.addEventListener("click",function(){ show(k); });
+    btns.appendChild(b);
+  });
+  box.appendChild(btns);
+
+  var lab = el("label",{"for":"tl-range",text:"Scrub the test clock: "});
+  var val = el("strong",{id:"tl-val",text:"0 s"}); lab.appendChild(val);
+  var range = el("input",{type:"range",id:"tl-range",min:"0",max:String(AXIS_MAX),step:"1",value:"0"});
+  var stat = el("p",{id:"tl-stat","aria-live":"polite"});
+  function scrub(){
+    var t = +range.value;
+    val.textContent = t+" s";
+    cur.style.left = pct(t);
+    stat.textContent = t<IGNITION_S ? "Before the reported ignition ("+IGNITION_S+" s)."
+      : t<SMOKE_S ? (t-IGNITION_S)+" s after the reported ignition; smoke detection is reported later, at "+SMOKE_S+" s."
+      : (t-IGNITION_S)+" s after ignition, at or after the reported smoke detection ("+SMOKE_S+" s).";
+  }
+  range.addEventListener("input",scrub);
+  box.appendChild(lab); box.appendChild(range); box.appendChild(stat);
+  box.appendChild(out);
+
+  var dl = el("dl",{"aria-label":"Reported test conditions"});
+  TL_CONDITIONS.forEach(function(c){
+    dl.appendChild(el("dt",{text:c[0]}));
+    dl.appendChild(el("dd",null,[document.createTextNode(c[1]+" ("), srcLinks(c[2]), document.createTextNode(")")]));
+  });
+  box.appendChild(el("h4",{"class":"tl-h",text:"Reported test conditions (VI-3)",style:"margin-top:16px"}));
+  box.appendChild(dl);
+  box.appendChild(el("p",{"class":"note",style:"margin:10px 0 0",text:"Slide numbers are the page numbers of the NASA presentation PDF (also printed on each slide). Links open the PDF at that page in browsers that support page anchors."}));
+  show("ign"); scrub();
+  return box;
+}
+
+/* ===== Ask a question: local retrieval UI + optional cited answer (server mode) ===== */
+/* corpus.js and search.js are separate script files so the same corpus is used by the server.
+   They load from a local file too (script tags are not blocked on file://). */
+var CORPUS = window.EVIDENCE_CORPUS, ENGINE = window.EvidenceSearch && CORPUS ? window.EvidenceSearch.create(CORPUS) : null;
+var EXAMPLES = [
+  "What oxygen concentration was used in the VI-3 test?",
+  "How does ventilation relate to the burning in these studies?",
+  "Which study reports cool flames discovered on the station?"
+];
+var FIELD_NAME = {text:"passage text", label:"study/type label", meta:"verified metadata"};
+var lastSearch = null;      // {question, ids}
+var synthToken = 0;         // ignore stale responses
+var statusState = "pending";// pending | on | off | error  (state of GET /api/status)
+var statusInfo = {};        // last /api/status body: {synthesis, provider, model, reason, timeoutMs}
+
+function markText(text, stems){
+  var frag = document.createDocumentFragment();
+  text.split(/([A-Za-z0-9]+)/).forEach(function(part){
+    if(!part) return;
+    if(/^[A-Za-z0-9]+$/.test(part) && stems[ENGINE.stem(part.toLowerCase())] && !ENGINE.STOP[part.toLowerCase()]){
+      frag.appendChild(el("mark",{text:part}));
+    } else frag.appendChild(document.createTextNode(part));
+  });
+  return frag;
+}
+function reducedMotion(){ return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
+function openStudyCard(id){
+  openId = id; renderCards();
+  var b = document.querySelector('button.head[data-id="'+id+'"]');
+  if(b){ b.scrollIntoView({block:"start"}); b.focus({preventScroll:true}); }
+}
+function openTimeline(){
+  openId = "saffire"; renderCards();
+  var t = document.getElementById("timeline");
+  if(t){ t.scrollIntoView({block:"start"}); t.focus({preventScroll:true}); }
+}
+function srcLink(p){
+  var a = el("a",{href:p.slide?CORPUS.slideUrl(p.slide):p.url,target:"_blank",rel:"noopener"});
+  a.textContent = p.slide ? "NASA presentation PDF, slide "+p.slide+" ↗" : (p.study==="saffire" ? "NTRS record (abstract) ↗" : "NASA source page ↗");
+  return a;
+}
+
+/* ---- what works right now (offline file, server without a key, server with a key) ---- */
+function offReason(){
+  var r = statusInfo.reason;
+  if(r==="ollama_down") return {short:"Local model is not running", why:"Start Ollama to enable it", note:"Start Ollama, then search again."};
+  if(r==="model_missing") return {short:"Local model is not installed", why:"the local model is not installed", note:"Install it with: ollama pull "+(statusInfo.model||"qwen2.5:3b")+"."};
+  return {short:"Not set up on this server", why:"no AI is configured", note:"No AI key or local model is configured here."};
+}
+function synthAvailability(){
+  if(location.protocol==="file:") return {ok:false, short:"Unavailable offline", note:"Cited answers need the server (see README). Search still works."};
+  if(statusState==="off"){ var o = offReason(); return {ok:false, short:o.short, note:o.note+" Search still works."}; }
+  if(statusState==="error") return {ok:false, short:"Answer service unreachable", note:"Search still works."};
+  return {ok:true};
+}
+function isLocalModel(){ return statusInfo.provider==="ollama"; }
+function modeText(){
+  if(location.protocol==="file:") return "Offline mode: search works without a server. “Generate cited answer” needs the server.";
+  if(statusState==="off"){
+    var r = statusInfo.reason;
+    if(r==="ollama_down") return "Search works. “Generate cited answer” is off: the local model is not running (start Ollama).";
+    if(r==="model_missing") return "Search works. “Generate cited answer” is off: the local model is not installed.";
+    return "Search works. “Generate cited answer” is not set up on this server (no AI key configured).";
+  }
+  if(statusState==="error") return "Search works. The cited-answer service could not be reached.";
+  if(statusState==="on"){
+    if(isLocalModel()) return "Search works offline. “Generate cited answer” is available (local model "+(statusInfo.model||"")+" on this computer; may contain errors).";
+    return "Search works offline. “Generate cited answer” is available (AI-written, may contain errors).";
+  }
+  return "Search works offline.";
+}
+function refreshStatus(){
+  if(location.protocol==="file:" || !window.fetch) return Promise.resolve();
+  return fetch("/api/status",{credentials:"same-origin",cache:"no-store"}).then(function(r){return r.ok?r.json():null;})
+    .then(function(j){ if(j){ statusInfo = j; statusState = j.synthesis ? "on" : "off"; } else statusState = "error"; updateModeUi(); })
+    .catch(function(){ statusState = "error"; updateModeUi(); });
+}
+function updateModeUi(){
+  var m = document.getElementById("mode-note"); if(m) m.textContent = modeText();
+  var b = document.getElementById("synth-go"); if(!b || b.getAttribute("data-busy")) return;
+  var a = synthAvailability(), why = document.getElementById("synth-why");
+  b.disabled = !a.ok;
+  if(why) why.textContent = a.ok ? "" : a.short+". "+a.note;
+}
+
+function renderResults(out){
+  var section = document.getElementById("evidence"), box = document.getElementById("res"), h = document.getElementById("ev-h");
+  section.hidden = false; box.textContent = ""; lastSearch = null;
+  out.notices.forEach(function(n){ box.appendChild(el("p",{"class":"warn",role:"note",text:n.text})); });
+  if(out.status==="insufficient"){
+    h.textContent = "No sufficient evidence";
+    box.appendChild(el("div",{"class":"insuff"},[
+      el("h3",{text:"Insufficient evidence"}),
+      el("p",{text:"No passage in the curated NASA sources matches this question well enough to show. "+out.reason}),
+      el("p",{"class":"note",text:"Nothing was guessed. Try wording that uses terms from the sources, such as smoke, ignition, airflow, oxygen, pressure, PMMA or cool flames."})
+    ]));
+    return;
+  }
+  var n = out.results.length, partial = out.status==="partial";
+  h.textContent = partial ? "Related evidence: "+n+" passage"+(n>1?"s":"")+", none answers the question" : "Evidence: "+n+" passage"+(n>1?"s":"")+" found";
+  var scopeNote = out.namedStudies.length ? " Limited to "+out.namedStudies.map(function(s){return CORPUS.studies[s].name;}).join(" and ")+", the study named in the question." : "";
+  var btn = el("button",{type:"button","class":"go",id:"synth-go","aria-describedby":"synth-why",text:"Generate cited answer"});
+  btn.addEventListener("click", function(){ runSynthesis(btn); });
+  var head = el("div",{"class":"res-head"},[
+    el("p",{"class":"note",text:"Ranked by BM25F score with synonym expansion."+scopeNote+" Highlighted words are the matched terms."}),
+    el("div",{"class":"gen"},[btn, el("p",{"class":"note",id:"synth-why"})])
+  ]);
+  box.appendChild(head);
+  box.appendChild(el("div",{id:"synth-out","class":"synth-out","aria-live":"polite"}));
+
+  var ol = el("ol",{"class":"hits"});
+  out.results.forEach(function(r,i){
+    var p = r.p, st = byId(p.study), stems = {};
+    r.matches.forEach(function(m){ stems[m.term]=1; if(m.syn) stems[m.syn]=1; });
+    var why = r.matches.map(function(m){
+      var f = m.fields.map(function(x){return FIELD_NAME[x];}).join(" + ");
+      return m.how==="exact" ? "“"+m.word+"” (exact, in "+f+")" : "“"+m.word+"” → “"+m.synWord+"” (synonym, in "+f+")";
+    }).join("; ");
+    var q = el("p",{"class":"hit-text"}); q.appendChild(markText(p.text, stems));
+    var src = el("p"); src.appendChild(srcLink(p));
+    if(p.slide){ src.appendChild(document.createTextNode(" · ")); src.appendChild(el("a",{href:p.url,target:"_blank",rel:"noopener",text:"NTRS record ↗"})); }
+    var cardBtn = el("button",{type:"button","class":"open-card",text:"Open study card: "+st.name});
+    cardBtn.addEventListener("click",function(){ openStudyCard(p.study); });
+    var actions = el("div",{"class":"actions"},[cardBtn]);
+    if(/VI-3/.test(p.scope)){
+      var tlBtn = el("button",{type:"button","class":"open-card","data-timeline":"1",text:"Show VI-3 timeline"});
+      tlBtn.addEventListener("click", openTimeline); actions.appendChild(tlBtn);
+    }
+    var badges = [el("strong",{text:(i+1)+". "+st.name}), el("span",{"class":"badge solid",text:CORPUS.typeLabel[p.type]}), el("span",{"class":"badge",text:"ID "+p.id})];
+    if(partial) badges.push(el("span",{"class":"badge related",text:"Related, not an answer"}));
+    ol.appendChild(el("li",{"class":"hit"+(partial?" is-related":""),"data-pid":p.id,"data-score":r.score.toFixed(3)},[
+      el("div",{"class":"hit-h"},badges),
+      q,
+      el("p",{"class":"note",text:"Scope: "+p.scope}),
+      src,
+      el("p",{"class":"why"},[el("strong",{text:"Why it matched: "}), document.createTextNode(why+". Score "+r.score.toFixed(2)+", "+Math.round(r.coverage*100)+"% of weighted question terms covered."+(r.unmatched.length?" Not matched: "+r.unmatched.join(", ")+".":""))]),
+      actions
+    ]));
+  });
+  box.appendChild(ol);
+  lastSearch = {question: out.question, ids: out.results.map(function(r){return r.p.id;}), partial: partial};
+  updateModeUi();
+}
+
+/* ---- cited answer (server mode; local results never depend on it) ---- */
+function synthMsg(out, kind, title, text, retry){
+  out.textContent = ""; out.removeAttribute("aria-busy");
+  var box = el("div",{"class":"synth-msg "+kind,role: kind==="error" ? "alert" : "status"},[el("strong",{text:title}), el("p",{text:text})]);
+  if(retry){ var b = el("button",{type:"button","class":"open-card",text:"Try again"}); b.addEventListener("click",retry); box.appendChild(b); }
+  out.appendChild(box);
+}
+function runSynthesis(btn){
+  var out = document.getElementById("synth-out");
+  if(!lastSearch || !out) return;
+  var mine = ++synthToken, snap = lastSearch;
+  btn.disabled = true; btn.setAttribute("data-busy","1"); btn.textContent = "Generating…";
+  out.setAttribute("aria-busy","true");
+  out.textContent = ""; out.appendChild(el("p",{"class":"loading",role:"status",text: isLocalModel()
+    ? "Asking the local model on this computer… this can take 10 to 60 seconds. The evidence below is unchanged."
+    : "Asking the AI model… this usually takes a few seconds. The evidence below is unchanged."}));
+  var ctl = new AbortController(), timer = setTimeout(function(){ ctl.abort(); }, (statusInfo.timeoutMs || 20000) + 5000);
+  function done(){ clearTimeout(timer); if(mine===synthToken){ btn.removeAttribute("data-busy"); btn.textContent = "Generate cited answer"; updateModeUi(); } }
+  function retry(){ runSynthesis(btn); }
+  fetch("/api/synthesize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:snap.question,passageIds:snap.ids}),signal:ctl.signal,credentials:"same-origin"})
+    .then(function(r){ return r.json().catch(function(){return null;}).then(function(j){ return {status:r.status, body:j}; }); })
+    .then(function(r){
+      if(mine!==synthToken) return;
+      done();
+      if(r.status===200 && r.body) return renderSynthesis(out, r.body);
+      var e = r.body && r.body.error || {};
+      if(r.status===429) return synthMsg(out,"error","Too many requests", e.message || "Please wait a little and try again.", null);
+      if(e.code==="not_configured"){ statusState = "off"; statusInfo = {reason:"no_key"}; updateModeUi(); return synthMsg(out,"error","Not set up on this server", "No AI is configured here. The evidence below still answers from the NASA sources.", null); }
+      if(e.code==="model_unavailable"){ statusState = "off"; statusInfo = Object.assign({}, statusInfo, {reason: /not installed/.test(e.message||"") ? "model_missing" : "ollama_down"}); updateModeUi(); return synthMsg(out,"error","Local model unavailable", (e.message || "The local model could not be reached.")+" The evidence below is unaffected.", null); }
+      synthMsg(out,"error","Cited answer unavailable", (e.message || "The service returned an error.")+" The evidence below is unaffected.", retry);
+    })
+    .catch(function(err){
+      if(mine!==synthToken) return;
+      done();
+      synthMsg(out,"error","Cited answer unavailable", (err && err.name==="AbortError" ? "The request timed out." : "Could not reach the answer service.")+" The evidence below is unaffected.", retry);
+    });
+}
+function renderSynthesis(out, d){
+  out.textContent = ""; out.removeAttribute("aria-busy");
+  if(d.provider==="mock") out.appendChild(el("p",{"class":"mockbar",text:"MOCK PROVIDER (testing only). This is not a real AI model."}));
+  if(d.status==="insufficient"){
+    out.appendChild(el("div",{"class":"synth-msg insufficient",role:"status"},[
+      el("strong",{text:"The evidence cannot support an answer"}),
+      el("p",{text:"The AI model found that these passages do not answer your question, so it wrote no answer."+(d.reason?" "+d.reason:"")}),
+      el("p",{"class":"note",text:"The related passages below are still what the sources say."})
+    ]));
+    return;
+  }
+  var byIdSrc = {}; (d.sources||[]).forEach(function(s){ byIdSrc[s.id]=s; });
+  var box = el("div",{"class":"syn-ans",role:"region","aria-label":"Cited answer"});
+  box.appendChild(el("p",{"class":"badge solid",text:"AI-generated answer"+(d.model && d.provider!=="mock" ? " ("+d.model+(d.provider==="ollama" ? ", local model" : "")+")" : "")+" · may contain errors"}));
+  var ul = el("ul",{"class":"claims"});
+  d.claims.forEach(function(c){
+    var li = el("li",{"class":"claim"});
+    li.appendChild(el("span",{text:c.text+" "}));
+    c.citations.forEach(function(id){
+      var s = byIdSrc[id]; if(!s) return;
+      var a = el("a",{"class":"cite",href:s.slideUrl||s.url,target:"_blank",rel:"noopener","data-cite":id});
+      a.textContent = "["+id+(s.slide?", slide "+s.slide:"")+"]";
+      li.appendChild(a); li.appendChild(document.createTextNode(" "));
+    });
+    var kinds = el("span",{"class":"kinds"});
+    if(c.singleTest) kinds.appendChild(el("span",{"class":"badge",text:"Single-test observation (preliminary)"}));
+    if(c.kinds.length===1 && c.kinds[0]==="objective") kinds.appendChild(el("span",{"class":"badge",text:"Study objective, not a result"}));
+    else c.kinds.forEach(function(k){ kinds.appendChild(el("span",{"class":"badge",text:CORPUS.typeLabel[k]})); });
+    li.appendChild(kinds);
+    ul.appendChild(li);
+  });
+  box.appendChild(ul);
+  box.appendChild(el("p",{"class":"note",text:"Each claim cites the NASA passages it uses. It adds no safety limits or recommendations."}));
+  out.appendChild(box);
+}
+
+function runLocalSearch(q){
+  synthToken++;  // invalidate any in-flight answer for a previous question
+  renderResults(ENGINE.search(q));
+  refreshStatus();   // picks up Ollama being started (or stopped) without a page reload
+  // Bring the results into view and move focus to their heading, so the next Tab lands on the first control
+  // in the results and Shift+Tab goes back to the search box. Respects reduced-motion.
+  var h = document.getElementById("ev-h");
+  h.scrollIntoView({block:"start", behavior: reducedMotion() ? "auto" : "smooth"});
+  h.focus({preventScroll:true});
+}
+function renderExplore(){
+  var form = document.getElementById("ask"), input = document.getElementById("q"), ex = document.getElementById("ex");
+  updateModeUi();
+  if(!ENGINE){
+    var sec = document.getElementById("evidence"); sec.hidden = false;
+    document.getElementById("res").appendChild(el("p",{"class":"warn",role:"alert",text:"Evidence search could not start because corpus.js or search.js did not load. Keep index.html, corpus.js and search.js in the same folder."}));
+    form.querySelector("button").disabled = true; return;
+  }
+  EXAMPLES.forEach(function(t){
+    var b = el("button",{type:"button",text:t});
+    b.addEventListener("click",function(){ input.value = t; input.focus(); }); // autofill only; does not search
+    ex.appendChild(b);
+  });
+  form.addEventListener("submit",function(e){
+    e.preventDefault();
+    var q = input.value.trim();
+    if(!q){ input.focus(); document.getElementById("mode-note").textContent = "Type a question first."; return; }
+    runLocalSearch(q);
+  });
+  refreshStatus();
+}
+
+function renderCards(){
+  var list = document.getElementById("cards");
+  list.textContent = "";
+  var order = ordered(current);
+  order.forEach(function(s, idx){
+    var isOpen = openId===s.id;
+    var head = el("button", {type:"button","class":"head","aria-expanded":String(isOpen),"aria-controls":"d-"+s.id,"data-id":s.id});
+    head.appendChild(el("span",{"class":"chev","aria-hidden":"true",text:isOpen?"−":"+"}));
+    head.appendChild(el("h3",{text:(idx+1)+". "+s.name}));
+    head.appendChild(el("p",{"class":"sub",text:s.studied}));
+    var row = el("div",{"class":"row"},[
+      el("span",{"class":"badge solid",text:"Topic relevance: "+pointsLabel(s.points[current])}),
+      el("span",{"class":"badge",text:s.status})
+    ]);
+    head.appendChild(row);
+    head.addEventListener("click", function(){ openId = (openId===s.id)?null:s.id; renderCards(); var b=document.querySelector('button.head[data-id="'+s.id+'"]'); if(b) b.focus(); });
+
+    var d = el("div",{"class":"detail",id:"d-"+s.id});
+    if(!isOpen) d.hidden = true;
+    d.appendChild(field("Why it ranks here for "+TOPICS[current], s.why[current]));
+    d.appendChild(field(s.findingLabel, s.finding));
+    if(s.id==="saffire") d.appendChild(buildTimeline());
+    d.appendChild(field("Experimental context", s.context));
+    d.appendChild(field("Short interpretation (AI-assisted)", s.interp, "interp"));
+    var link = el("a",{href:s.url,target:"_blank",rel:"noopener",text:"Open NASA source: "+s.sourceTitle+" ↗"});
+    d.appendChild(el("div",{"class":"field"},[el("h4",{text:"Source ("+s.kind+")"}), el("p",{},[link])]));
+
+    list.appendChild(el("li",{"class":"card","data-id":s.id},[head,d]));
+  });
+  document.getElementById("order-note").textContent =
+    "Showing order for “"+TOPICS[current]+"”: "+order.map(function(s){return s.name;}).join(" → ")+".";
+}
+
+function byId(id){ return STUDIES.filter(function(s){return s.id===id;})[0]; }
+function cell(tag, text){ var c = el(tag,{text:text}); if(text===NA) c.className="na"; return c; }
+
+function renderCompare(){
+  var a = byId(document.getElementById("cmpA").value);
+  var b = byId(document.getElementById("cmpB").value);
+  var msg = document.getElementById("cmp-msg");
+  var t = document.getElementById("cmp-table");
+  t.textContent = "";
+  if(a.id===b.id){ document.getElementById("cmp-sum").textContent = ""; msg.textContent = "Choose two different studies to compare."; return; }
+  msg.textContent = "Comparing "+a.name+" with "+b.name+".";
+  var sum = document.getElementById("cmp-sum"); sum.textContent = "";
+  sum.appendChild(el("h3",{text:"Comparison summary"}));
+  [a,b].forEach(function(s){
+    sum.appendChild(el("p",{text:s.name+": "+s.evType+" ("+s.evScope+")."}));
+  });
+  sum.appendChild(el("p",{text: a.evType===b.evType
+    ? "Both are "+a.evType.toLowerCase()+"s, but they cover different studies and reported conditions, so their findings should not be merged into one result."
+    : "One source reports an observation and the other states an objective, so they can be compared on what was studied but not on results."}));
+  var thead = el("thead",null,[el("tr",null,[el("th",{scope:"col",text:"Aspect"}),el("th",{scope:"col",text:a.name}),el("th",{scope:"col",text:b.name})])]);
+  var rows = [
+    ["Source type", function(s){return s.kind;}],
+    ["Status of claim", function(s){return s.status;}],
+    ["What it studied", function(s){return s.studied;}],
+    ["Reported finding or objective", function(s){return s.finding;}],
+    ["Platform", function(s){return s.cond.platform;}],
+    ["Fuel / material", function(s){return s.cond.material===NA?s.cond.fuel:s.cond.material+" ("+s.cond.fuel+")";}],
+    ["Airflow", function(s){return s.cond.flow;}],
+    ["Oxygen", function(s){return s.cond.oxygen;}],
+    ["Pressure", function(s){return s.cond.pressure;}]
+  ];
+  var tb = el("tbody");
+  rows.forEach(function(r){
+    tb.appendChild(el("tr",null,[el("th",{scope:"row",text:r[0]}),cell("td",r[1](a)),cell("td",r[1](b))]));
+  });
+  var la = el("td",null,[el("a",{href:a.url,target:"_blank",rel:"noopener",text:"NASA source ↗"})]);
+  var lb = el("td",null,[el("a",{href:b.url,target:"_blank",rel:"noopener",text:"NASA source ↗"})]);
+  tb.appendChild(el("tr",null,[el("th",{scope:"row",text:"Link"}),la,lb]));
+  t.appendChild(el("caption",{"class":"sr",text:"Comparison of "+a.name+" and "+b.name}));
+  t.appendChild(thead); t.appendChild(tb);
+}
+
+function setTopic(t){
+  current = t;
+  Array.prototype.forEach.call(document.querySelectorAll(".topics button"), function(b){
+    b.setAttribute("aria-pressed", String(b.getAttribute("data-topic")===t));
+  });
+  renderCards();
+}
+
+function init(){
+  ["cmpA","cmpB"].forEach(function(id,i){
+    var sel = document.getElementById(id);
+    STUDIES.forEach(function(s){ sel.appendChild(el("option",{value:s.id,text:s.name})); });
+    sel.selectedIndex = i;
+    sel.addEventListener("change", renderCompare);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".topics button"), function(b){
+    b.addEventListener("click", function(){ setTopic(b.getAttribute("data-topic")); });
+  });
+  setTopic("smoke");
+  renderCompare();
+  renderExplore();
+}
+init();
+})();
+</script>
+</body>
+</html>
